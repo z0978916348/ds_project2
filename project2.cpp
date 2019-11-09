@@ -1,11 +1,12 @@
 #include <iostream>
 #include <utility> // for pair<T,T>
-
+#include <fstream>
 #include "queue.h"
 #include "stack.h"
-
+int count = 0;
 using namespace std;
-
+ifstream inFile("floor.data", ios::in);
+ofstream outFile("floor.output", ios::out);
 struct floor{
     int f_row;
     int f_col;
@@ -15,6 +16,70 @@ struct floor{
     floor(int r, int c, int w): f_row(r), f_col(c), f_weight(w), prev(nullptr){}
 };
 
+class AnsNode{
+    friend class Ans;
+private:
+    int row;
+    int col;
+    AnsNode* next;
+public:
+    AnsNode():row(0),col(0), next(nullptr){};
+    AnsNode(int r, int c,AnsNode* next):row(r),col(c), next(next){};
+};
+
+class Ans{
+private:
+    AnsNode* head = nullptr;
+    AnsNode* tail = nullptr;
+public:
+    Ans(): head(nullptr), tail(nullptr){}
+    void Print_Final_Answer() {
+        AnsNode* temp = head;
+        int r, c;
+        while (temp != nullptr) {
+            c = temp->col;
+            r = temp->row;
+            //cout << r << " " << c << endl;
+            outFile << r << " " << c << endl;
+            temp = temp->next; 
+        }
+    }
+    void Clean() {
+        AnsNode* temp = head;
+        while (temp != nullptr) {
+            temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void CopyList(floor *start) {
+        floor* temp = start;
+        AnsNode* temp1;
+        if ( head == nullptr && tail == nullptr ) {
+            head = new AnsNode(start->f_row, start->f_col, nullptr);
+            tail = head;
+            temp = temp->prev;  // next
+            temp1 = head;
+            count++;
+        }
+        else temp1 = tail;
+        //temp1 = temp1->next;
+        while ( temp != nullptr ) {
+            //AnsNode* new_node = new AnsNode(temp->f_row, temp->f_col, nullptr);
+            //temp1 = new_node;
+            if ( temp->prev == nullptr ) {
+                tail = temp1; 
+                break;
+            }
+            
+            temp1->next = new AnsNode(temp->f_row, temp->f_col, nullptr);
+            count++;
+            temp1 = temp1->next;
+            temp = temp->prev;   // next
+        }
+    }
+};
 class Clean_Robot{
     public:
         // initialize row, col, battery, map
@@ -36,7 +101,8 @@ class Clean_Robot{
             char c;
             for (int i=0; i<row; i++){
                 for (int j=0; j<col; j++) {
-                    cin >> c;
+                    //cin >> c;
+                    inFile >> c;
                     if (c == 'R') 
                         Recharge = new floor(i, j, 0);
                     else if (c == '0')
@@ -130,6 +196,8 @@ floor* Clean_Robot::BFS_Path(floor *start, floor *end) {
     queue<floor*> queue;
     queue.push(start);
     
+    
+
     while ( !queue.empty() ) {
         floor *cur = queue.front();
         queue.pop();
@@ -226,16 +294,18 @@ bool Clean_Robot::IsClear() {
 void Clean_Robot::GetPair(int &r, int &c) {
     r = dirty.Top().first;   // for row
     c = dirty.Top().second;  // for col
+    num--;                   // dirty floor
     dirty.pop();
 }
 void Clean_Robot::traversal(floor* start) {    
     floor* temp = start;
-    while (temp != nullptr) {
-        cout << "(" << temp->f_row << "," << temp->f_col << ")" << endl;
+    while (temp->prev != nullptr) {
+        //cout << "(" << temp->f_row << "," << temp->f_col << ")" << endl;
         map_check[temp->f_row][temp->f_col] = '2';
         temp = temp->prev;
     }
-    cout << endl;
+    map_check[temp->f_row][temp->f_col] = '2';
+    //cout << endl;
     return;
 }
 
@@ -261,12 +331,26 @@ bool Clean_Robot::Check_needed(int pos_row, int pos_col) {
 
 int main() 
 {
+    //ifstream inFile("floor.data", ios::in);
+    if (! inFile) {
+        cout << "cannot open floor.data" << endl;
+        return 1;
+    }
+    if (! outFile) {
+        cout << "cannot open floor.output" << endl;
+        return 1;
+    }
     int m, n, battery;
-    cin >> m >> n >> battery;
+    //cin >> m >> n >> battery;
+    inFile >> m >> n >> battery;   
+
 
     Clean_Robot robot(m, n, battery);  // Initialize map
-
+    
     robot.Dirty_floor();                // Store dirty floor as pair<int, int>
+    
+    floor *a;
+    Ans Record;
 
     int pos_r, pos_c;                   
 
@@ -282,13 +366,26 @@ int main()
         
 
         floor *path = robot.BFS_Path(start, end);    // create path from R to 0
-        
+
         floor* forward = robot.reverse(path);
         robot.traversal(forward);
+        Record.CopyList(forward);
+        
+        //Record.Print_Final_Answer();
+        //cout << endl;
         floor* backward = robot.reverse(forward);
         robot.traversal(backward);
+        Record.CopyList(backward);
+        
+        //Record.Print_Final_Answer();
+        //cout << endl;
     }
-
+    //cout << count << endl;
+    outFile << count << endl;
+    Record.Print_Final_Answer();
+    floor* R_Pos = robot.Get_R_Pos();
+    //cout << R_Pos->f_row << " " << R_Pos->f_col << endl;
+    outFile << R_Pos->f_row << " " << R_Pos->f_col << endl;
     return 0;    
 }
 
