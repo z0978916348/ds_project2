@@ -34,6 +34,7 @@ private:
 public:
     Ans(): head(nullptr), tail(nullptr){}
     void Print_Final_Answer() {
+        //if (head == tail) return;
         AnsNode* temp = head;
         int r, c;
         while (temp != nullptr) {
@@ -131,6 +132,9 @@ class Clean_Robot{
         // Check whether is all clear ?
         bool IsClear();
 
+        // for debug
+        bool Check_All_Clean();
+
         // Access dirty (x, y)
         void GetPair(int &x, int &y);
 
@@ -146,6 +150,15 @@ class Clean_Robot{
 
         // check ever cleaned?
         bool Check_needed(int pos_row, int pos_col);
+        
+        void Clean(floor* start) {
+            floor* temp = start;
+            while (temp != nullptr) {
+                temp = start;
+                start = start->prev;
+                delete temp;
+            }
+        }
 
 
     private:
@@ -329,6 +342,15 @@ bool Clean_Robot::Check_needed(int pos_row, int pos_col) {
     else return true;
 }
 
+bool Clean_Robot::Check_All_Clean() {
+    for (int i=0; i<row; i++) {
+        for (int j=0; j<col; j++) {
+            if (map_check[i][j] == '0') return false;
+        }
+    }
+    return true;
+}
+
 int main() 
 {
     //ifstream inFile("floor.data", ios::in);
@@ -377,9 +399,11 @@ int main()
         robot.traversal(backward);
         Record.CopyList(backward);
         
+        
         //Record.Print_Final_Answer();
         //cout << endl;
     }
+    //if ( robot.Check_All_Clean()) cout << " All Clean !!!" << endl;
     //cout << count << endl;
     outFile << count << endl;
     Record.Print_Final_Answer();
