@@ -6,7 +6,7 @@
 int count = 0;
 using namespace std;
 ifstream inFile("floor.data", ios::in);
-ofstream outFile("floor.output", ios::out);
+ofstream outFile("final.path", ios::out);
 struct floor{
     int f_row;
     int f_col;
@@ -404,7 +404,7 @@ int main()
         //Record.Print_Final_Answer();
         //cout << endl;
     }
-    if ( robot.Check_All_Clean()) cout << " All Clean !!!" << endl;
+    //if ( robot.Check_All_Clean()) cout << " All Clean !!!" << endl;
     //cout << count << endl;
     outFile << count << endl;
     Record.Print_Final_Answer();
