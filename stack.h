@@ -25,9 +25,11 @@ bool isEmpty() {
 T Top() {
     if (top)
         return top->data;
-    else
-        throw "Empty";
-        //cout << "stack is empty" << endl;
+    else {
+        return top->data;
+        cout << "stack is empty" << endl;
+    }
+        
 }
 void push(const T & val) {
     if (top == nullptr) {

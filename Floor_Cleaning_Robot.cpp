@@ -220,7 +220,7 @@ floor* Clean_Robot::BFS_Path(floor *start, floor *end) {
         if (r == end->f_row && c == end->f_col) return cur;  // return pointer which is backward to start
         //cout << "123" << endl;
         if ( r>=1 && visited[r-1][c] ) {               //向上走
-            
+            visited[r-1][c] = false;
             int up_distance_row = ( r-1 - Recharge->f_row );
             int up_distance_col = ( c   - Recharge->f_col );
             if ( up_distance_row<0 ) up_distance_row = 0 - up_distance_row ;
@@ -234,7 +234,7 @@ floor* Clean_Robot::BFS_Path(floor *start, floor *end) {
             if (r-1 == end->f_row && c == end->f_col) return step_up;
         } 
         if ( c<=col-2 && visited[r][c+1]  ) {           //向右走
-            
+            visited[r][c+1] = false;
             int right_distance_row = ( r   - Recharge->f_row );
             int right_distance_col = ( c+1 - Recharge->f_col );
             if ( right_distance_row<0 ) right_distance_row = 0 - right_distance_row ;
@@ -248,7 +248,7 @@ floor* Clean_Robot::BFS_Path(floor *start, floor *end) {
             if (r == end->f_row && c+1 == end->f_col) return step_right;
         } 
         if ( c>=1 && visited[r][c-1] ) {               //向左走
-            
+            visited[r][c-1] = false;
             int left_distance_row = ( r   - Recharge->f_row );
             int left_distance_col = ( c-1 - Recharge->f_col );
             if ( left_distance_row<0 ) left_distance_row = 0 - left_distance_row ;
@@ -263,6 +263,7 @@ floor* Clean_Robot::BFS_Path(floor *start, floor *end) {
         }
         //cout << "456" << endl;
         if (  r<=row-2 && visited[r+1][c] ) {            //向下走
+            visited[r+1][c] = false;
             int down_distance_row = ( r+1 - Recharge->f_row );
             int down_distance_col = ( c   - Recharge->f_col );
             if ( down_distance_row<0 ) down_distance_row = 0 - down_distance_row ;
@@ -403,7 +404,7 @@ int main()
         //Record.Print_Final_Answer();
         //cout << endl;
     }
-    //if ( robot.Check_All_Clean()) cout << " All Clean !!!" << endl;
+    if ( robot.Check_All_Clean()) cout << " All Clean !!!" << endl;
     //cout << count << endl;
     outFile << count << endl;
     Record.Print_Final_Answer();
@@ -412,4 +413,3 @@ int main()
     outFile << R_Pos->f_row << " " << R_Pos->f_col << endl;
     return 0;    
 }
-
